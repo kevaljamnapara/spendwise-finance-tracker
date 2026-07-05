@@ -10,12 +10,14 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Trash2, Plus, Receipt } from 'lucide-react';
+import ImageUpload from '@/components/ImageUpload';
 
 const expenseSchema = z.object({
   category: z.string().min(1, 'Category is required'),
   amount: z.coerce.number().positive('Amount must be greater than 0'),
   date: z.string().optional(),
   description: z.string().max(500, 'Description is too long').optional(),
+  receiptUrl: z.string().optional(),
 });
 
 export default function Expense() {
@@ -32,6 +34,7 @@ export default function Expense() {
       amount: '',
       date: new Date().toISOString().split('T')[0],
       description: '',
+      receiptUrl: '',
     },
   });
 
@@ -65,6 +68,7 @@ export default function Expense() {
         amount: '',
         date: new Date().toISOString().split('T')[0],
         description: '',
+        receiptUrl: '',
       });
       fetchData();
     } catch (err) {
@@ -141,6 +145,16 @@ export default function Expense() {
                 <div className="space-y-2">
                   <Label htmlFor="description">Description (Optional)</Label>
                   <Input id="description" placeholder="Additional details..." className="rounded-xl" {...form.register('description')} />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Receipt Image (Optional)</Label>
+                  <ImageUpload 
+                    value={form.watch('receiptUrl')} 
+                    onChange={(url) => form.setValue('receiptUrl', url, { shouldDirty: true })}
+                    endpoint="/upload/receipt"
+                    title="Upload Receipt"
+                  />
                 </div>
 
                 <Button type="submit" className="w-full rounded-xl mt-2" disabled={isSubmitting}>

@@ -3,9 +3,13 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import { connectDB } from './config/db.js';
+import { configureCloudinary } from './config/cloudinary.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
 
 dotenv.config();
+
+// Configure Cloudinary
+configureCloudinary();
 
 const app = express();
 
@@ -28,6 +32,7 @@ import categoryRoutes from './routes/categoryRoutes.js';
 import expenseRoutes from './routes/expenseRoutes.js';
 import budgetRoutes from './routes/budgetRoutes.js';
 import savingsRoutes from './routes/savingsRoutes.js';
+import uploadRoutes from './routes/uploadRoutes.js';
 
 // Routes
 app.use('/api/v1/auth', authRoutes);
@@ -37,6 +42,7 @@ app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/expenses', expenseRoutes);
 app.use('/api/v1/budgets', budgetRoutes);
 app.use('/api/v1/savings', savingsRoutes);
+app.use('/api/v1/upload', uploadRoutes);
 
 app.get('/api/v1/health', (req, res) => {
   res.status(200).json({ status: 'success', message: 'SpendWise API is running' });

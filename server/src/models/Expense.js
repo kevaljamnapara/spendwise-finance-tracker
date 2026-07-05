@@ -25,6 +25,12 @@ const expenseSchema = mongoose.Schema(
     description: {
       type: String,
     },
+    receiptUrl: {
+      type: String,
+    },
+    receiptId: {
+      type: String,
+    },
   },
   {
     timestamps: true,

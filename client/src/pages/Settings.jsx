@@ -7,10 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import ImageUpload from '@/components/ImageUpload';
 
 const profileSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().min(1, 'Email is required').email('Invalid email address'),
+  avatar: z.string().optional(),
 });
 
 const passwordSchema = z.object({
@@ -32,6 +34,7 @@ export default function Settings() {
     defaultValues: {
       name: user?.name || '',
       email: user?.email || '',
+      avatar: user?.avatar || '',
     },
   });
 
@@ -48,6 +51,7 @@ export default function Settings() {
       profileForm.reset({
         name: user.name,
         email: user.email,
+        avatar: user.avatar || '',
       });
     }
   }, [user, profileForm]);
@@ -110,6 +114,16 @@ export default function Settings() {
                 </div>
               )}
               
+              <div className="space-y-2 mb-6">
+                <Label>Profile Picture</Label>
+                <ImageUpload 
+                  value={profileForm.watch('avatar')} 
+                  onChange={(url) => profileForm.setValue('avatar', url, { shouldDirty: true })}
+                  endpoint="/upload/avatar"
+                  title="Upload Avatar"
+                />
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
                 <Input 

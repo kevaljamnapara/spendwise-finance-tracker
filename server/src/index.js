@@ -33,6 +33,7 @@ import expenseRoutes from './routes/expenseRoutes.js';
 import budgetRoutes from './routes/budgetRoutes.js';
 import savingsRoutes from './routes/savingsRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 // Routes
 app.use('/api/v1/auth', authRoutes);
@@ -43,6 +44,7 @@ app.use('/api/v1/expenses', expenseRoutes);
 app.use('/api/v1/budgets', budgetRoutes);
 app.use('/api/v1/savings', savingsRoutes);
 app.use('/api/v1/upload', uploadRoutes);
+app.use('/api/v1/admin', adminRoutes);
 
 app.get('/api/v1/health', (req, res) => {
   res.status(200).json({ status: 'success', message: 'SpendWise API is running' });

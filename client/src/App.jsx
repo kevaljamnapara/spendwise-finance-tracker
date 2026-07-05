@@ -10,6 +10,7 @@ import Categories from '@/pages/Categories';
 import Budget from '@/pages/Budget';
 import Savings from '@/pages/Savings';
 import Settings from '@/pages/Settings';
+import Admin from '@/pages/Admin';
 import DashboardLayout from '@/layouts/DashboardLayout';
 
 const ProtectedRoute = ({ children }) => {
@@ -43,6 +44,7 @@ function App() {
             <Route path="/categories" element={<Categories />} />
             <Route path="/budgets" element={<Budget />} />
             <Route path="/savings" element={<Savings />} />
+            <Route path="/admin" element={<Admin />} />
             <Route path="/settings" element={<Settings />} />
           </Route>
         </Routes>

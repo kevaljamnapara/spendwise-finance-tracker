@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Trash2, Plus, Pencil, X } from 'lucide-react';
+import { Trash2, Plus, Pencil, X, Download } from 'lucide-react';
 
 const incomeSchema = z.object({
   source: z.string().min(1, 'Source is required').max(100, 'Source is too long'),
@@ -107,6 +107,30 @@ export default function Income() {
     }
   };
 
+  const exportToCSV = () => {
+    const headers = ['Date', 'Source', 'Description', 'Amount (₹)'];
+    const rows = incomes.map(income => [
+      new Date(income.date).toLocaleDateString('en-IN'),
+      income.source,
+      income.description || '',
+      income.amount
+    ]);
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(e => e.map(val => `"${String(val).replace(/"/g, '""')}"`).join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `SpendWise_Income_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -116,9 +140,17 @@ export default function Income() {
 
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Income Management</h1>
-        <p className="text-zinc-500 dark:text-zinc-400 mt-2">Track and manage your sources of income.</p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Income Management</h1>
+          <p className="text-zinc-500 dark:text-zinc-400 mt-2">Track and manage your sources of income.</p>
+        </div>
+        {incomes.length > 0 && (
+          <Button onClick={exportToCSV} variant="outline" className="rounded-xl no-print self-start md:self-auto">
+            <Download className="w-4 h-4 mr-2" />
+            Export CSV
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

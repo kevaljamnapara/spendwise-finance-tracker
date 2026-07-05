@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Trash2, Plus, PiggyBank } from 'lucide-react';
+import { Trash2, Plus, PiggyBank, Check, X } from 'lucide-react';
 
 const savingsSchema = z.object({
   title: z.string().min(1, 'Title is required').max(100, 'Title is too long'),
@@ -20,6 +20,9 @@ export default function Savings() {
   const [goals, setGoals] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [updatingGoalId, setUpdatingGoalId] = useState(null);
+  const [updateAmount, setUpdateAmount] = useState('');
+  const [isUpdatingProgress, setIsUpdatingProgress] = useState(false);
   const [error, setError] = useState('');
 
   const form = useForm({
@@ -63,21 +66,33 @@ export default function Savings() {
     }
   };
 
-  const handleUpdateProgress = async (id, currentAmount, targetAmount) => {
-    const amountStr = window.prompt(`Enter new total saved amount (Target: ₹${targetAmount}):`, currentAmount);
-    if (amountStr === null) return;
-    
-    const newAmount = parseFloat(amountStr);
-    if (isNaN(newAmount) || newAmount < 0) {
-      alert('Please enter a valid positive number');
+  const startUpdating = (goal) => {
+    setUpdatingGoalId(goal._id);
+    setUpdateAmount('');
+  };
+
+  const handleSaveProgress = async (goal) => {
+    const addAmount = parseFloat(updateAmount);
+    if (isNaN(addAmount)) {
+      alert('Please enter a valid number');
       return;
     }
 
+    const newTotal = goal.currentAmount + addAmount;
+    if (newTotal < 0) {
+      alert('Total savings cannot be negative');
+      return;
+    }
+
+    setIsUpdatingProgress(true);
     try {
-      await savingsService.updateSavingsGoal(id, { currentAmount: newAmount });
+      await savingsService.updateSavingsGoal(goal._id, { currentAmount: newTotal });
+      setUpdatingGoalId(null);
       fetchGoals();
     } catch (err) {
       setError('Failed to update progress');
+    } finally {
+      setIsUpdatingProgress(false);
     }
   };
 
@@ -182,14 +197,43 @@ export default function Savings() {
                             )}
                           </div>
                           <div className="flex items-center gap-2">
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => handleUpdateProgress(goal._id, goal.currentAmount, goal.targetAmount)}
-                              className="rounded-lg h-8 text-xs"
-                            >
-                              Update Progress
-                            </Button>
+                            {updatingGoalId === goal._id ? (
+                              <div className="flex items-center gap-1">
+                                <Input 
+                                  type="number"
+                                  step="0.01"
+                                  value={updateAmount}
+                                  onChange={(e) => setUpdateAmount(e.target.value)}
+                                  className="w-24 h-8 rounded-lg text-xs"
+                                  placeholder="+ Add amount"
+                                />
+                                <Button 
+                                  size="sm" 
+                                  onClick={() => handleSaveProgress(goal)}
+                                  className="h-8 w-8 p-0 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white"
+                                  disabled={isUpdatingProgress}
+                                >
+                                  <Check className="w-4 h-4" />
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  onClick={() => setUpdatingGoalId(null)}
+                                  className="h-8 w-8 p-0 rounded-lg text-zinc-500 hover:text-zinc-900"
+                                >
+                                  <X className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            ) : (
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => startUpdating(goal)}
+                                className="rounded-lg h-8 text-xs"
+                              >
+                                Add Savings
+                              </Button>
+                            )}
                             <Button 
                               variant="ghost" 
                               size="icon" 

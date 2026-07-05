@@ -73,8 +73,8 @@ export default function Savings() {
 
   const handleSaveProgress = async (goal) => {
     const addAmount = parseFloat(updateAmount);
-    if (isNaN(addAmount)) {
-      alert('Please enter a valid number');
+    if (isNaN(addAmount) || addAmount <= 0) {
+      alert('Please enter a valid positive amount greater than 0');
       return;
     }
 

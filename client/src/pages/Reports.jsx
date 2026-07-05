@@ -3,8 +3,9 @@ import reportsService from '@/services/reportsService';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { TrendingUp, TrendingDown, DollarSign, Activity } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, Activity, FileText } from 'lucide-react';
 
 export default function Reports() {
   const [reportData, setReportData] = useState(null);
@@ -47,13 +48,48 @@ export default function Reports() {
   const { summary, timeline, expenseByCategory, incomeBySource } = reportData || {};
 
   return (
-    <div className="p-6 md:p-8 max-w-6xl mx-auto space-y-8">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div className="p-6 md:p-8 max-w-6xl mx-auto space-y-8 print-report">
+      <style>{`
+        @media print {
+          body * {
+            visibility: hidden;
+          }
+          .print-report, .print-report * {
+            visibility: visible;
+          }
+          .print-report {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            padding: 20px !important;
+            background: white !important;
+            color: black !important;
+          }
+          .no-print {
+            display: none !important;
+          }
+          .card {
+            border: 1px solid #e4e4e7 !important;
+            box-shadow: none !important;
+          }
+        }
+      `}</style>
+
+      {/* Print Only Header */}
+      <div className="hidden print:block border-b border-zinc-200 pb-4 mb-6">
+        <h1 className="text-3xl font-bold text-center text-zinc-900">SpendWise Financial Report</h1>
+        <p className="text-center text-zinc-500 mt-2">
+          Statement Period: {new Date(startDate).toLocaleDateString('en-IN')} to {new Date(endDate).toLocaleDateString('en-IN')}
+        </p>
+      </div>
+
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 no-print">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Financial Reports</h1>
           <p className="text-zinc-500 dark:text-zinc-400 mt-2">Comprehensive analysis of your finances.</p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex flex-wrap items-end gap-4">
           <div>
             <Label htmlFor="startDate" className="mb-2 block text-xs text-zinc-500">From Date</Label>
             <Input 
@@ -74,6 +110,10 @@ export default function Reports() {
               className="rounded-xl bg-white dark:bg-zinc-950 w-36"
             />
           </div>
+          <Button onClick={() => window.print()} className="rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-900">
+            <FileText className="w-4 h-4 mr-2" />
+            Download PDF
+          </Button>
         </div>
       </div>
 

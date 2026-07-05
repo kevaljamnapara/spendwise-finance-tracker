@@ -102,7 +102,7 @@ export default function Income() {
         handleCancelEdit();
       }
       fetchIncomes();
-    } catch (err) {
+    } catch {
       setError('Failed to delete record');
     }
   };

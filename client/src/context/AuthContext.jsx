@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const { data } = await authService.getMe();
         setUser(data);
-      } catch (error) {
+      } catch {
         setUser(null);
       } finally {
         setLoading(false);

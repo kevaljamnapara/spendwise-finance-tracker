@@ -1,0 +1,7 @@
+{
+  "venvPath": "analytics",
+  "venv": "venv",
+  "extraPaths": [
+    "analytics"
+  ]
+}

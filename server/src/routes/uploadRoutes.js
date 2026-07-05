@@ -52,7 +52,7 @@ router.delete('/', protect, async (req, res) => {
   try {
     await cloudinary.uploader.destroy(id);
     res.json({ success: true, message: 'File deleted successfully' });
-  } catch (error) {
+  } catch {
     res.status(500).json({ success: false, message: 'Failed to delete file' });
   }
 });

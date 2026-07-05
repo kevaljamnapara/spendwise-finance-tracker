@@ -92,7 +92,7 @@ export default function Savings() {
       await savingsService.updateSavingsGoal(goal._id, { currentAmount: newTotal });
       setUpdatingGoalId(null);
       fetchGoals();
-    } catch (err) {
+    } catch {
       setUpdateError('Failed to update progress');
     } finally {
       setIsUpdatingProgress(false);
@@ -104,7 +104,7 @@ export default function Savings() {
     try {
       await savingsService.deleteSavingsGoal(id);
       fetchGoals();
-    } catch (err) {
+    } catch {
       setError('Failed to delete goal');
     }
   };

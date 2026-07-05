@@ -54,7 +54,7 @@ UserSchema.methods.matchPassword = async function (enteredPassword) {
 
 // Exclude password from the JSON response
 UserSchema.set('toJSON', {
-  transform: (doc, ret, options) => {
+  transform: (doc, ret) => {
     delete ret.password;
     return ret;
   }

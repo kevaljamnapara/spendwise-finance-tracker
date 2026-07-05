@@ -14,11 +14,6 @@ export default function Admin() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Protect route
-  if (user && user.role !== 'admin') {
-    return <Navigate to="/dashboard" replace />;
-  }
-
   const fetchData = async () => {
     setIsLoading(true);
     try {
@@ -37,8 +32,15 @@ export default function Admin() {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (user && user.role === 'admin') {
+      fetchData();
+    }
+  }, [user]);
+
+  // Protect route
+  if (user && user.role !== 'admin') {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   const handleDeleteUser = async (id) => {
     if (!window.confirm('Are you sure you want to delete this user? ALL of their data will be permanently lost.')) return;

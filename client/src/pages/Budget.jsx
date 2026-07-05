@@ -79,7 +79,7 @@ export default function Budget() {
     try {
       await budgetService.deleteBudget(id);
       fetchData(selectedMonth);
-    } catch (err) {
+    } catch {
       setError('Failed to delete budget');
     }
   };

@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from 'cloudinary';
-import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import multerStorageCloudinary from 'multer-storage-cloudinary';
 import multer from 'multer';
 
 // Configure Cloudinary
@@ -12,7 +12,7 @@ const configureCloudinary = () => {
 };
 
 // Storage setup for Avatars
-const avatarStorage = new CloudinaryStorage({
+const avatarStorage = new multerStorageCloudinary({
   cloudinary: cloudinary,
   params: {
     folder: 'spendwise/avatars',
@@ -22,7 +22,7 @@ const avatarStorage = new CloudinaryStorage({
 });
 
 // Storage setup for Receipts
-const receiptStorage = new CloudinaryStorage({
+const receiptStorage = new multerStorageCloudinary({
   cloudinary: cloudinary,
   params: {
     folder: 'spendwise/receipts',

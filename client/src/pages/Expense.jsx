@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Trash2, Plus, Receipt, Pencil, X, Download } from 'lucide-react';
+import { Trash2, Plus, Pencil, X, Download } from 'lucide-react';
 import ImageUpload from '@/components/ImageUpload';
 
 const expenseSchema = z.object({
@@ -114,7 +114,7 @@ export default function Expense() {
         handleCancelEdit();
       }
       fetchData();
-    } catch (err) {
+    } catch {
       setError('Failed to delete record');
     }
   };

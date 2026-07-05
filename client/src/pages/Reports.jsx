@@ -17,20 +17,20 @@ export default function Reports() {
   const [startDate, setStartDate] = useState(`${currentYear}-01-01`);
   const [endDate, setEndDate] = useState(`${currentYear}-12-31`);
 
-  const fetchReports = async () => {
-    setIsLoading(true);
-    try {
-      const response = await reportsService.getReports(startDate, endDate);
-      setReportData(response.data);
-    } catch (err) {
-      setError('Failed to load reports');
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchReports = async () => {
+      setIsLoading(true);
+      try {
+        const response = await reportsService.getReports(startDate, endDate);
+        setReportData(response.data);
+      } catch (err) {
+        setError('Failed to load reports');
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     fetchReports();
   }, [startDate, endDate]);
 

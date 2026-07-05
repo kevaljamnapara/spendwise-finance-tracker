@@ -83,13 +83,16 @@ def predict_expense(request):
             
     expenses = list(db.expenses.find(query))
     
-    if len(expenses) < 5:
-        return Response({'error': 'Not enough data to train models. Need at least 5 records.'}, status=400)
+    if len(expenses) < 1:
+        return Response({'error': 'No expense records found. Please add some expenses first.'}, status=400)
         
     df = pd.DataFrame(expenses)
     df['amount'] = pd.to_numeric(df['amount'], errors='coerce').fillna(0)
     df['date'] = pd.to_datetime(df['date'], errors='coerce')
     df = df.dropna(subset=['date'])
+    
+    if df.empty:
+        return Response({'error': 'No valid expense records with dates found.'}, status=400)
     
     # Aggregate by month
     df['month_num'] = df['date'].dt.month + (df['date'].dt.year * 12)
@@ -97,8 +100,17 @@ def predict_expense(request):
     monthly_data = df.groupby('month_num')['amount'].sum().reset_index()
     monthly_data = monthly_data.sort_values('month_num')
     
-    if len(monthly_data) < 3:
-         return Response({'error': 'Need data spread across at least 3 months for reliable prediction.'}, status=400)
+    if len(monthly_data) < 1:
+        return Response({'error': 'No monthly expense records could be compiled.'}, status=400)
+        
+    if len(monthly_data) == 1:
+        # Fallback for single month of data
+        single_amount = float(monthly_data.iloc[0]['amount'])
+        return Response({
+            'linear_regression_prediction': round(single_amount, 2),
+            'decision_tree_prediction': round(single_amount, 2),
+            'historical_trend': monthly_data.to_dict('records')
+        })
     
     # Prepare X (features - time index) and y (target - amount)
     # We will normalize month_num to start from 0
@@ -124,7 +136,7 @@ def predict_expense(request):
     dt_prediction = max(0, dt_model.predict(X_pred)[0])
     
     return Response({
-        'linear_regression_prediction': round(lr_prediction, 2),
-        'decision_tree_prediction': round(dt_prediction, 2),
+        'linear_regression_prediction': round(float(lr_prediction), 2),
+        'decision_tree_prediction': round(float(dt_prediction), 2),
         'historical_trend': monthly_data.to_dict('records')
     })

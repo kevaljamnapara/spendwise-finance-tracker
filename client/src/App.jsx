@@ -10,6 +10,7 @@ import Categories from '@/pages/Categories';
 import Budget from '@/pages/Budget';
 import Savings from '@/pages/Savings';
 import Reports from '@/pages/Reports';
+import Predictions from '@/pages/Predictions';
 import Settings from '@/pages/Settings';
 import Admin from '@/pages/Admin';
 import DashboardLayout from '@/layouts/DashboardLayout';
@@ -46,6 +47,7 @@ function App() {
             <Route path="/budgets" element={<Budget />} />
             <Route path="/savings" element={<Savings />} />
             <Route path="/reports" element={<Reports />} />
+            <Route path="/predictions" element={<Predictions />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/settings" element={<Settings />} />
           </Route>

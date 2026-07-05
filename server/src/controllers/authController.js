@@ -49,6 +49,7 @@ export const registerUser = async (req, res, next) => {
           name: user.name,
           email: user.email,
           role: user.role,
+          avatar: user.avatar,
         }
       });
     } else {
@@ -79,6 +80,7 @@ export const authUser = async (req, res, next) => {
           name: user.name,
           email: user.email,
           role: user.role,
+          avatar: user.avatar,
         }
       });
     } else {
@@ -121,6 +123,7 @@ export const getUserProfile = async (req, res, next) => {
           name: user.name,
           email: user.email,
           role: user.role,
+          avatar: user.avatar,
         }
       });
     } else {
@@ -142,6 +145,10 @@ export const updateUserProfile = async (req, res, next) => {
     if (user) {
       user.name = req.body.name || user.name;
       user.email = req.body.email || user.email;
+      
+      if (req.body.avatar !== undefined) {
+        user.avatar = req.body.avatar;
+      }
 
       // Ensure new email isn't already taken by another user
       if (req.body.email && req.body.email !== user.email) {
@@ -162,6 +169,7 @@ export const updateUserProfile = async (req, res, next) => {
           name: updatedUser.name,
           email: updatedUser.email,
           role: updatedUser.role,
+          avatar: updatedUser.avatar,
         }
       });
     } else {

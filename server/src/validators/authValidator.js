@@ -47,6 +47,9 @@ export const updateProfileValidation = [
     .optional()
     .trim()
     .isEmail().withMessage('Please provide a valid email address'),
+  body('avatar')
+    .optional({ checkFalsy: true })
+    .isURL().withMessage('Avatar must be a valid URL'),
   handleValidationErrors
 ];
 

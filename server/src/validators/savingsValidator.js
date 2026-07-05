@@ -10,11 +10,11 @@ export const savingsValidation = [
     .isNumeric().withMessage('Target amount must be a number')
     .custom((value) => value > 0).withMessage('Target amount must be greater than 0'),
   body('currentAmount')
-    .optional()
+    .optional({ checkFalsy: true })
     .isNumeric().withMessage('Current amount must be a number')
     .custom((value) => value >= 0).withMessage('Current amount cannot be negative'),
   body('deadline')
-    .optional()
+    .optional({ checkFalsy: true })
     .isISO8601().withMessage('Invalid deadline date format'),
   handleValidationErrors
 ];

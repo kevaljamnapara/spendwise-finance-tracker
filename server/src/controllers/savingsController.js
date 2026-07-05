@@ -15,20 +15,22 @@ export const getSavingsGoals = async (req, res, next) => {
   }
 };
 
-// @desc    Create new savings goal
-// @route   POST /api/v1/savings
-// @access  Private
 export const createSavingsGoal = async (req, res, next) => {
   try {
     const { title, targetAmount, currentAmount, deadline } = req.body;
     
-    const goal = await SavingsGoal.create({
+    const goalData = {
       user: req.user._id,
       title,
       targetAmount,
       currentAmount: currentAmount || 0,
-      deadline
-    });
+    };
+
+    if (deadline && deadline !== '') {
+      goalData.deadline = deadline;
+    }
+    
+    const goal = await SavingsGoal.create(goalData);
 
     res.status(201).json({
       success: true,
@@ -57,9 +59,14 @@ export const updateSavingsGoal = async (req, res, next) => {
       throw new Error('Not authorized to update this goal');
     }
 
+    const updateData = { ...req.body };
+    if (updateData.deadline === '') {
+      updateData.deadline = null;
+    }
+
     goal = await SavingsGoal.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      updateData,
       { new: true, runValidators: true }
     );
 

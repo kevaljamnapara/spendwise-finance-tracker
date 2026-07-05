@@ -22,9 +22,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 import authRoutes from './routes/authRoutes.js';
+import dashboardRoutes from './routes/dashboardRoutes.js';
 
 // Routes
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/dashboard', dashboardRoutes);
 
 app.get('/api/v1/health', (req, res) => {
   res.status(200).json({ status: 'success', message: 'SpendWise API is running' });

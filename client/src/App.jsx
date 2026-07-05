@@ -5,6 +5,7 @@ import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import Dashboard from '@/pages/Dashboard';
 import Income from '@/pages/Income';
+import Categories from '@/pages/Categories';
 import Settings from '@/pages/Settings';
 import DashboardLayout from '@/layouts/DashboardLayout';
 
@@ -35,6 +36,7 @@ function App() {
           >
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/incomes" element={<Income />} />
+            <Route path="/categories" element={<Categories />} />
             <Route path="/settings" element={<Settings />} />
           </Route>
         </Routes>

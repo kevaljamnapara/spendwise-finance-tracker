@@ -1,4 +1,5 @@
 import Income from '../models/Income.js';
+import Expense from '../models/Expense.js';
 
 // @desc    Get all incomes for user
 // @route   GET /api/v1/incomes
@@ -57,6 +58,29 @@ export const updateIncome = async (req, res, next) => {
       throw new Error('Not authorized to update this record');
     }
 
+    const newAmount = req.body.amount;
+    if (newAmount !== undefined) {
+      const userId = req.user._id;
+      const [incomeTotalRes] = await Income.aggregate([
+        { $match: { user: userId } },
+        { $group: { _id: null, total: { $sum: '$amount' } } },
+      ]);
+      const [expenseTotalRes] = await Expense.aggregate([
+        { $match: { user: userId } },
+        { $group: { _id: null, total: { $sum: '$amount' } } },
+      ]);
+      const totalIncome = incomeTotalRes?.total || 0;
+      const totalExpense = expenseTotalRes?.total || 0;
+      
+      const balanceWithoutThisIncome = (totalIncome - income.amount) - totalExpense;
+      const projectedBalance = balanceWithoutThisIncome + newAmount;
+
+      if (projectedBalance < 0) {
+        res.status(400);
+        throw new Error(`Cannot update income. Reducing this income to ₹${newAmount} would cause your total balance to fall below zero (to ₹${projectedBalance.toFixed(2)}).`);
+      }
+    }
+
     income = await Income.findByIdAndUpdate(
       req.params.id,
       req.body,
@@ -88,6 +112,25 @@ export const deleteIncome = async (req, res, next) => {
     if (income.user.toString() !== req.user._id.toString()) {
       res.status(401);
       throw new Error('Not authorized to delete this record');
+    }
+
+    const userId = req.user._id;
+    const [incomeTotalRes] = await Income.aggregate([
+      { $match: { user: userId } },
+      { $group: { _id: null, total: { $sum: '$amount' } } },
+    ]);
+    const [expenseTotalRes] = await Expense.aggregate([
+      { $match: { user: userId } },
+      { $group: { _id: null, total: { $sum: '$amount' } } },
+    ]);
+    const totalIncome = incomeTotalRes?.total || 0;
+    const totalExpense = expenseTotalRes?.total || 0;
+    
+    const projectedBalance = (totalIncome - income.amount) - totalExpense;
+
+    if (projectedBalance < 0) {
+      res.status(400);
+      throw new Error(`Cannot delete income. Deleting this income would cause your total balance to fall below zero (to ₹${projectedBalance.toFixed(2)}).`);
     }
 
     await income.deleteOne();

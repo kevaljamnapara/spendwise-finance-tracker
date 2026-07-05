@@ -4,6 +4,7 @@ import Landing from '@/pages/Landing';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import Dashboard from '@/pages/Dashboard';
+import Income from '@/pages/Income';
 import Settings from '@/pages/Settings';
 import DashboardLayout from '@/layouts/DashboardLayout';
 
@@ -33,6 +34,7 @@ function App() {
             }
           >
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/incomes" element={<Income />} />
             <Route path="/settings" element={<Settings />} />
           </Route>
         </Routes>

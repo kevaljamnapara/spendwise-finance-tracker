@@ -17,6 +17,7 @@ export default function DashboardLayout() {
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { name: 'Income', path: '/incomes', icon: BarChart3 },
     { name: 'Settings', path: '/settings', icon: Settings },
   ];
 

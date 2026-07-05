@@ -198,19 +198,19 @@ export default function Savings() {
                           </div>
                           <div className="flex items-center gap-2">
                             {updatingGoalId === goal._id ? (
-                              <div className="flex items-center gap-1">
+                              <div className="flex items-center gap-1.5">
                                 <Input 
                                   type="number"
                                   step="0.01"
                                   value={updateAmount}
                                   onChange={(e) => setUpdateAmount(e.target.value)}
-                                  className="w-24 h-8 rounded-lg text-xs"
+                                  className="w-32 h-8 rounded-xl text-xs px-2.5"
                                   placeholder="+ Add amount"
                                 />
                                 <Button 
                                   size="sm" 
                                   onClick={() => handleSaveProgress(goal)}
-                                  className="h-8 w-8 p-0 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white"
+                                  className="h-8 w-8 p-0 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white"
                                   disabled={isUpdatingProgress}
                                 >
                                   <Check className="w-4 h-4" />
@@ -219,7 +219,7 @@ export default function Savings() {
                                   size="sm" 
                                   variant="outline"
                                   onClick={() => setUpdatingGoalId(null)}
-                                  className="h-8 w-8 p-0 rounded-lg text-zinc-500 hover:text-zinc-900"
+                                  className="h-8 w-8 p-0 rounded-xl text-zinc-500 hover:text-zinc-900"
                                 >
                                   <X className="w-4 h-4" />
                                 </Button>

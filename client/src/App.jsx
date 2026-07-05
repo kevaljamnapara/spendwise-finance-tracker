@@ -8,6 +8,7 @@ import Income from '@/pages/Income';
 import Expense from '@/pages/Expense';
 import Categories from '@/pages/Categories';
 import Budget from '@/pages/Budget';
+import Savings from '@/pages/Savings';
 import Settings from '@/pages/Settings';
 import DashboardLayout from '@/layouts/DashboardLayout';
 
@@ -41,6 +42,7 @@ function App() {
             <Route path="/expenses" element={<Expense />} />
             <Route path="/categories" element={<Categories />} />
             <Route path="/budgets" element={<Budget />} />
+            <Route path="/savings" element={<Savings />} />
             <Route path="/settings" element={<Settings />} />
           </Route>
         </Routes>

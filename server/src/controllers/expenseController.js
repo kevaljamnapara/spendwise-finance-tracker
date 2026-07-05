@@ -1,4 +1,5 @@
 import Expense from '../models/Expense.js';
+import Income from '../models/Income.js';
 
 // @desc    Get all expenses for user
 // @route   GET /api/v1/expenses
@@ -25,6 +26,25 @@ export const createExpense = async (req, res, next) => {
   try {
     const { category, amount, date, description } = req.body;
     
+    // Calculate current balance
+    const userId = req.user._id;
+    const [incomeTotal] = await Income.aggregate([
+      { $match: { user: userId } },
+      { $group: { _id: null, total: { $sum: '$amount' } } },
+    ]);
+    const [expenseTotal] = await Expense.aggregate([
+      { $match: { user: userId } },
+      { $group: { _id: null, total: { $sum: '$amount' } } },
+    ]);
+    const totalIncome = incomeTotal?.total || 0;
+    const totalExpense = expenseTotal?.total || 0;
+    const currentBalance = totalIncome - totalExpense;
+
+    if (currentBalance < amount) {
+      res.status(400);
+      throw new Error(`Insufficient balance. Current balance is ₹${currentBalance.toFixed(2)}, which is less than the expense amount.`);
+    }
+
     const expense = await Expense.create({
       user: req.user._id,
       category,
@@ -60,6 +80,28 @@ export const updateExpense = async (req, res, next) => {
     if (expense.user.toString() !== req.user._id.toString()) {
       res.status(401);
       throw new Error('Not authorized to update this record');
+    }
+
+    const newAmount = req.body.amount;
+    if (newAmount !== undefined) {
+      const userId = req.user._id;
+      const [incomeTotal] = await Income.aggregate([
+        { $match: { user: userId } },
+        { $group: { _id: null, total: { $sum: '$amount' } } },
+      ]);
+      const [expenseTotal] = await Expense.aggregate([
+        { $match: { user: userId } },
+        { $group: { _id: null, total: { $sum: '$amount' } } },
+      ]);
+      const totalIncome = incomeTotal?.total || 0;
+      const totalExpense = expenseTotal?.total || 0;
+      
+      const balanceWithoutThisExpense = totalIncome - (totalExpense - expense.amount);
+
+      if (balanceWithoutThisExpense < newAmount) {
+        res.status(400);
+        throw new Error(`Insufficient balance. Available balance is ₹${balanceWithoutThisExpense.toFixed(2)}, which is less than the updated expense amount.`);
+      }
     }
 
     expense = await Expense.findByIdAndUpdate(

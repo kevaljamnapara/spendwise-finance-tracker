@@ -46,9 +46,9 @@ export default function Predictions() {
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
     }).format(amount);
   };
 
@@ -138,7 +138,7 @@ export default function Predictions() {
                 <LineChart data={predictions.historical_trend} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e4e4e7" />
                   <XAxis dataKey="month_num" tick={{ fontSize: 12, fill: '#71717a' }} tickLine={false} axisLine={false} />
-                  <YAxis tickFormatter={(value) => `$${value}`} tick={{ fontSize: 12, fill: '#71717a' }} tickLine={false} axisLine={false} />
+                  <YAxis tickFormatter={(value) => `₹${value}`} tick={{ fontSize: 12, fill: '#71717a' }} tickLine={false} axisLine={false} />
                   <Tooltip formatter={(value) => formatCurrency(value)} labelFormatter={() => ''} />
                   <Line type="monotone" dataKey="amount" stroke="#6366f1" strokeWidth={3} dot={{ r: 4, fill: '#6366f1' }} activeDot={{ r: 6 }} />
                 </LineChart>

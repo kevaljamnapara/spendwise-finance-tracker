@@ -36,15 +36,14 @@ const UserSchema = new Schema(
 );
 
 // Encrypt password before saving
-UserSchema.pre('save', async function (next) {
+UserSchema.pre('save', async function () {
   if (!this.isModified('password')) {
-    next();
+    return;
   }
   const salt = await bcrypt.genSalt(10);
   if (this.password) {
     this.password = await bcrypt.hash(this.password, salt);
   }
-  next();
 });
 
 // Match user entered password to hashed password in database

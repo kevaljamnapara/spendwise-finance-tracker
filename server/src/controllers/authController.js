@@ -1,4 +1,5 @@
 import User from '../models/User.js';
+import Category from '../models/Category.js';
 import generateToken from '../utils/generateToken.js';
 
 // @desc    Register a new user
@@ -22,6 +23,23 @@ export const registerUser = async (req, res, next) => {
     });
 
     if (user) {
+      // Create default categories
+      const defaultCategories = [
+        // Expenses
+        { user: user._id, name: 'Food & Dining', type: 'expense', color: '#f87171' },
+        { user: user._id, name: 'Transportation', type: 'expense', color: '#60a5fa' },
+        { user: user._id, name: 'Housing', type: 'expense', color: '#34d399' },
+        { user: user._id, name: 'Utilities', type: 'expense', color: '#fbbf24' },
+        { user: user._id, name: 'Entertainment', type: 'expense', color: '#a78bfa' },
+        { user: user._id, name: 'Healthcare', type: 'expense', color: '#f472b6' },
+        { user: user._id, name: 'Shopping', type: 'expense', color: '#38bdf8' },
+        // Incomes
+        { user: user._id, name: 'Salary', type: 'income', color: '#34d399' },
+        { user: user._id, name: 'Freelance', type: 'income', color: '#60a5fa' },
+        { user: user._id, name: 'Investments', type: 'income', color: '#818cf8' },
+      ];
+      await Category.insertMany(defaultCategories);
+
       generateToken(res, user._id);
       res.status(201).json({
         success: true,

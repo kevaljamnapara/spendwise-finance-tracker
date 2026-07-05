@@ -34,9 +34,9 @@ export default function Reports() {
   }, [startDate, endDate]);
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
     }).format(amount);
   };
 
@@ -148,7 +148,7 @@ export default function Reports() {
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e4e4e7" />
                   <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#71717a' }} tickLine={false} axisLine={false} />
                   <YAxis 
-                    tickFormatter={(value) => `$${value}`} 
+                    tickFormatter={(value) => `₹${value}`} 
                     tick={{ fontSize: 12, fill: '#71717a' }} 
                     tickLine={false} 
                     axisLine={false}

@@ -64,7 +64,7 @@ export default function Savings() {
   };
 
   const handleUpdateProgress = async (id, currentAmount, targetAmount) => {
-    const amountStr = window.prompt(`Enter new total saved amount (Target: $${targetAmount}):`, currentAmount);
+    const amountStr = window.prompt(`Enter new total saved amount (Target: ₹${targetAmount}):`, currentAmount);
     if (amountStr === null) return;
     
     const newAmount = parseFloat(amountStr);
@@ -92,9 +92,9 @@ export default function Savings() {
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
     }).format(amount);
   };
 
@@ -125,13 +125,13 @@ export default function Savings() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="targetAmount">Target Amount ($)</Label>
+                  <Label htmlFor="targetAmount">Target Amount (₹)</Label>
                   <Input id="targetAmount" type="number" step="0.01" placeholder="0.00" className="rounded-xl" {...form.register('targetAmount')} />
                   {form.formState.errors.targetAmount && <p className="text-sm text-red-500">{form.formState.errors.targetAmount.message}</p>}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="currentAmount">Initial Saved ($) (Optional)</Label>
+                  <Label htmlFor="currentAmount">Initial Saved (₹) (Optional)</Label>
                   <Input id="currentAmount" type="number" step="0.01" placeholder="0.00" className="rounded-xl" {...form.register('currentAmount')} />
                   {form.formState.errors.currentAmount && <p className="text-sm text-red-500">{form.formState.errors.currentAmount.message}</p>}
                 </div>

@@ -85,9 +85,9 @@ export default function Budget() {
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
     }).format(amount);
   };
 
@@ -139,7 +139,7 @@ export default function Budget() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="amount">Budget Amount ($)</Label>
+                  <Label htmlFor="amount">Budget Amount (₹)</Label>
                   <Input id="amount" type="number" step="0.01" placeholder="0.00" className="rounded-xl" {...form.register('amount')} />
                   {form.formState.errors.amount && <p className="text-sm text-red-500">{form.formState.errors.amount.message}</p>}
                 </div>

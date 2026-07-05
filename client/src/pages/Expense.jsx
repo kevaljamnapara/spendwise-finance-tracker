@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Trash2, Plus, Receipt } from 'lucide-react';
+import { Trash2, Plus, Receipt, Pencil, X } from 'lucide-react';
 import ImageUpload from '@/components/ImageUpload';
 
 const expenseSchema = z.object({
@@ -25,6 +25,7 @@ export default function Expense() {
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingExpenseId, setEditingExpenseId] = useState(null);
   const [error, setError] = useState('');
 
   const form = useForm({
@@ -62,7 +63,12 @@ export default function Expense() {
     setIsSubmitting(true);
     setError('');
     try {
-      await expenseService.createExpense(values);
+      if (editingExpenseId) {
+        await expenseService.updateExpense(editingExpenseId, values);
+        setEditingExpenseId(null);
+      } else {
+        await expenseService.createExpense(values);
+      }
       form.reset({
         category: '',
         amount: '',
@@ -72,16 +78,41 @@ export default function Expense() {
       });
       fetchData();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to add expense');
+      setError(err.response?.data?.message || `Failed to ${editingExpenseId ? 'update' : 'add'} expense`);
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleEditClick = (expense) => {
+    setEditingExpenseId(expense._id);
+    form.reset({
+      category: expense.category?._id || expense.category || '',
+      amount: expense.amount,
+      date: expense.date ? new Date(expense.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+      description: expense.description || '',
+      receiptUrl: expense.receiptUrl || '',
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingExpenseId(null);
+    form.reset({
+      category: '',
+      amount: '',
+      date: new Date().toISOString().split('T')[0],
+      description: '',
+      receiptUrl: '',
+    });
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this record?')) return;
     try {
       await expenseService.deleteExpense(id);
+      if (editingExpenseId === id) {
+        handleCancelEdit();
+      }
       fetchData();
     } catch (err) {
       setError('Failed to delete record');
@@ -89,9 +120,9 @@ export default function Expense() {
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
     }).format(amount);
   };
 
@@ -104,12 +135,14 @@ export default function Expense() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* Add Expense Form */}
+        {/* Add/Edit Expense Form */}
         <div className="lg:col-span-1">
           <Card className="rounded-2xl border-zinc-200 dark:border-zinc-800 shadow-sm sticky top-8">
             <CardHeader>
-              <CardTitle>Add New Expense</CardTitle>
-              <CardDescription>Record a new expense transaction</CardDescription>
+              <CardTitle>{editingExpenseId ? 'Edit Expense' : 'Add New Expense'}</CardTitle>
+              <CardDescription>
+                {editingExpenseId ? 'Update the details of this expense' : 'Record a new expense transaction'}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -131,7 +164,7 @@ export default function Expense() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="amount">Amount ($)</Label>
+                  <Label htmlFor="amount">Amount (₹)</Label>
                   <Input id="amount" type="number" step="0.01" placeholder="0.00" className="rounded-xl" {...form.register('amount')} />
                   {form.formState.errors.amount && <p className="text-sm text-red-500">{form.formState.errors.amount.message}</p>}
                 </div>
@@ -157,10 +190,27 @@ export default function Expense() {
                   />
                 </div>
 
-                <Button type="submit" className="w-full rounded-xl mt-2" disabled={isSubmitting}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  {isSubmitting ? 'Adding...' : 'Add Expense'}
-                </Button>
+                <div className="flex gap-2 mt-2">
+                  {editingExpenseId && (
+                    <Button type="button" variant="outline" className="flex-1 rounded-xl" onClick={handleCancelEdit}>
+                      <X className="w-4 h-4 mr-2" />
+                      Cancel
+                    </Button>
+                  )}
+                  <Button type="submit" className="flex-1 rounded-xl" disabled={isSubmitting}>
+                    {editingExpenseId ? (
+                      <>
+                        <Pencil className="w-4 h-4 mr-2" />
+                        {isSubmitting ? 'Saving...' : 'Save Changes'}
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-4 h-4 mr-2" />
+                        {isSubmitting ? 'Adding...' : 'Add Expense'}
+                      </>
+                    )}
+                  </Button>
+                </div>
               </form>
             </CardContent>
           </Card>
@@ -187,7 +237,7 @@ export default function Expense() {
                         <TableHead>Category</TableHead>
                         <TableHead>Description</TableHead>
                         <TableHead className="text-right">Amount</TableHead>
-                        <TableHead className="w-[50px]"></TableHead>
+                        <TableHead className="w-[100px] text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -204,15 +254,25 @@ export default function Expense() {
                           <TableCell className="text-right font-bold text-red-600 dark:text-red-500">
                             {formatCurrency(expense.amount)}
                           </TableCell>
-                          <TableCell>
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              onClick={() => handleDelete(expense._id)}
-                              className="text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                onClick={() => handleEditClick(expense)}
+                                className="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+                              >
+                                <Pencil className="w-4 h-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                onClick={() => handleDelete(expense._id)}
+                                className="text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}

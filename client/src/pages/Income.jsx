@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Trash2, Plus } from 'lucide-react';
+import { Trash2, Plus, Pencil, X } from 'lucide-react';
 
 const incomeSchema = z.object({
   source: z.string().min(1, 'Source is required').max(100, 'Source is too long'),
@@ -21,6 +21,7 @@ export default function Income() {
   const [incomes, setIncomes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingIncomeId, setEditingIncomeId] = useState(null);
   const [error, setError] = useState('');
 
   const form = useForm({
@@ -53,7 +54,12 @@ export default function Income() {
     setIsSubmitting(true);
     setError('');
     try {
-      await incomeService.createIncome(values);
+      if (editingIncomeId) {
+        await incomeService.updateIncome(editingIncomeId, values);
+        setEditingIncomeId(null);
+      } else {
+        await incomeService.createIncome(values);
+      }
       form.reset({
         source: '',
         amount: '',
@@ -62,16 +68,39 @@ export default function Income() {
       });
       fetchIncomes();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to add income');
+      setError(err.response?.data?.message || `Failed to ${editingIncomeId ? 'update' : 'add'} income`);
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleEditClick = (income) => {
+    setEditingIncomeId(income._id);
+    form.reset({
+      source: income.source,
+      amount: income.amount,
+      date: income.date ? new Date(income.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+      description: income.description || '',
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingIncomeId(null);
+    form.reset({
+      source: '',
+      amount: '',
+      date: new Date().toISOString().split('T')[0],
+      description: '',
+    });
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this record?')) return;
     try {
       await incomeService.deleteIncome(id);
+      if (editingIncomeId === id) {
+        handleCancelEdit();
+      }
       fetchIncomes();
     } catch (err) {
       setError('Failed to delete record');
@@ -79,9 +108,9 @@ export default function Income() {
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
     }).format(amount);
   };
 
@@ -94,12 +123,14 @@ export default function Income() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* Add Income Form */}
+        {/* Add/Edit Income Form */}
         <div className="lg:col-span-1">
           <Card className="rounded-2xl border-zinc-200 dark:border-zinc-800 shadow-sm sticky top-8">
             <CardHeader>
-              <CardTitle>Add New Income</CardTitle>
-              <CardDescription>Record a new source of revenue</CardDescription>
+              <CardTitle>{editingIncomeId ? 'Edit Income' : 'Add New Income'}</CardTitle>
+              <CardDescription>
+                {editingIncomeId ? 'Update the details of this income' : 'Record a new source of revenue'}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -112,7 +143,7 @@ export default function Income() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="amount">Amount ($)</Label>
+                  <Label htmlFor="amount">Amount (₹)</Label>
                   <Input id="amount" type="number" step="0.01" placeholder="0.00" className="rounded-xl" {...form.register('amount')} />
                   {form.formState.errors.amount && <p className="text-sm text-red-500">{form.formState.errors.amount.message}</p>}
                 </div>
@@ -128,10 +159,27 @@ export default function Income() {
                   <Input id="description" placeholder="Additional details..." className="rounded-xl" {...form.register('description')} />
                 </div>
 
-                <Button type="submit" className="w-full rounded-xl mt-2" disabled={isSubmitting}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  {isSubmitting ? 'Adding...' : 'Add Income'}
-                </Button>
+                <div className="flex gap-2 mt-2">
+                  {editingIncomeId && (
+                    <Button type="button" variant="outline" className="flex-1 rounded-xl" onClick={handleCancelEdit}>
+                      <X className="w-4 h-4 mr-2" />
+                      Cancel
+                    </Button>
+                  )}
+                  <Button type="submit" className="flex-1 rounded-xl" disabled={isSubmitting}>
+                    {editingIncomeId ? (
+                      <>
+                        <Pencil className="w-4 h-4 mr-2" />
+                        {isSubmitting ? 'Saving...' : 'Save Changes'}
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-4 h-4 mr-2" />
+                        {isSubmitting ? 'Adding...' : 'Add Income'}
+                      </>
+                    )}
+                  </Button>
+                </div>
               </form>
             </CardContent>
           </Card>
@@ -158,7 +206,7 @@ export default function Income() {
                         <TableHead>Source</TableHead>
                         <TableHead>Description</TableHead>
                         <TableHead className="text-right">Amount</TableHead>
-                        <TableHead className="w-[50px]"></TableHead>
+                        <TableHead className="w-[100px] text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -170,15 +218,25 @@ export default function Income() {
                           <TableCell className="text-right font-bold text-emerald-600 dark:text-emerald-500">
                             {formatCurrency(income.amount)}
                           </TableCell>
-                          <TableCell>
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              onClick={() => handleDelete(income._id)}
-                              className="text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                onClick={() => handleEditClick(income)}
+                                className="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+                              >
+                                <Pencil className="w-4 h-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                onClick={() => handleDelete(income._id)}
+                                className="text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}

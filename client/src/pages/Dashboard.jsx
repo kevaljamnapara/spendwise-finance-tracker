@@ -176,7 +176,11 @@ export default function Dashboard() {
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white"
                           style={{ backgroundColor: tx.type === 'expense' ? tx.color : '#10b981' }}
                         >
-                          <Receipt className="w-5 h-5" />
+                          {tx.type === 'income' ? (
+                            <ArrowUpRight className="w-5 h-5" />
+                          ) : (
+                            <Receipt className="w-5 h-5" />
+                          )}
                         </div>
                         <div>
                           <p className="text-sm font-medium">{tx.title}</p>

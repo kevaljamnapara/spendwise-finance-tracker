@@ -18,3 +18,23 @@ export const savingsValidation = [
     .isISO8601().withMessage('Invalid deadline date format'),
   handleValidationErrors
 ];
+
+export const savingsUpdateValidation = [
+  body('title')
+    .optional()
+    .trim()
+    .notEmpty().withMessage('Title cannot be empty')
+    .isLength({ max: 100 }).withMessage('Title cannot exceed 100 characters'),
+  body('targetAmount')
+    .optional()
+    .isNumeric().withMessage('Target amount must be a number')
+    .custom((value) => value > 0).withMessage('Target amount must be greater than 0'),
+  body('currentAmount')
+    .optional({ checkFalsy: true })
+    .isNumeric().withMessage('Current amount must be a number')
+    .custom((value) => value >= 0).withMessage('Current amount cannot be negative'),
+  body('deadline')
+    .optional({ checkFalsy: true })
+    .isISO8601().withMessage('Invalid deadline date format'),
+  handleValidationErrors
+];

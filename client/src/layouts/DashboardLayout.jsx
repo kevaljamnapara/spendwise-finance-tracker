@@ -49,12 +49,12 @@ export default function DashboardLayout() {
         md:block w-full md:w-64 bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800 flex-shrink-0
       `}>
         <div className="h-full flex flex-col">
-          <div className="hidden md:flex p-6 items-center gap-2 text-zinc-900 dark:text-white">
+          <Link to="/dashboard" className="hidden md:flex p-6 items-center gap-2 text-zinc-900 dark:text-white hover:opacity-80 transition-opacity">
             <div className="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-white flex items-center justify-center">
               <BarChart3 className="text-white dark:text-zinc-900 w-5 h-5" />
             </div>
             <span className="font-semibold tracking-tight">SpendWise</span>
-          </div>
+          </Link>
 
           <div className="p-4 flex-1">
             <div className="space-y-1">

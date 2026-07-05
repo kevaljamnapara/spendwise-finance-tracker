@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { BarChart3, Settings, LogOut, LayoutDashboard, Menu, X, Tag } from 'lucide-react';
+import { BarChart3, Settings, LogOut, LayoutDashboard, Menu, X, Tag, Receipt } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function DashboardLayout() {
@@ -18,6 +18,7 @@ export default function DashboardLayout() {
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Income', path: '/incomes', icon: BarChart3 },
+    { name: 'Expenses', path: '/expenses', icon: Receipt },
     { name: 'Categories', path: '/categories', icon: Tag },
     { name: 'Settings', path: '/settings', icon: Settings },
   ];

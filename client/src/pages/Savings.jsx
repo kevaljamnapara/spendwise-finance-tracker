@@ -23,6 +23,7 @@ export default function Savings() {
   const [updatingGoalId, setUpdatingGoalId] = useState(null);
   const [updateAmount, setUpdateAmount] = useState('');
   const [isUpdatingProgress, setIsUpdatingProgress] = useState(false);
+  const [updateError, setUpdateError] = useState('');
   const [error, setError] = useState('');
 
   const form = useForm({
@@ -69,28 +70,30 @@ export default function Savings() {
   const startUpdating = (goal) => {
     setUpdatingGoalId(goal._id);
     setUpdateAmount('');
+    setUpdateError('');
   };
 
   const handleSaveProgress = async (goal) => {
     const addAmount = parseFloat(updateAmount);
     if (isNaN(addAmount) || addAmount <= 0) {
-      alert('Please enter a valid positive amount greater than 0');
+      setUpdateError('Enter amount > 0');
       return;
     }
 
     const newTotal = goal.currentAmount + addAmount;
     if (newTotal < 0) {
-      alert('Total savings cannot be negative');
+      setUpdateError('Savings cannot be negative');
       return;
     }
 
     setIsUpdatingProgress(true);
+    setUpdateError('');
     try {
       await savingsService.updateSavingsGoal(goal._id, { currentAmount: newTotal });
       setUpdatingGoalId(null);
       fetchGoals();
     } catch (err) {
-      setError('Failed to update progress');
+      setUpdateError('Failed to update progress');
     } finally {
       setIsUpdatingProgress(false);
     }
@@ -198,31 +201,42 @@ export default function Savings() {
                           </div>
                           <div className="flex items-center gap-2">
                             {updatingGoalId === goal._id ? (
-                              <div className="flex items-center gap-1.5">
-                                <Input 
-                                  type="number"
-                                  step="0.01"
-                                  value={updateAmount}
-                                  onChange={(e) => setUpdateAmount(e.target.value)}
-                                  className="w-32 h-8 rounded-xl text-xs px-2.5"
-                                  placeholder="+ Add amount"
-                                />
-                                <Button 
-                                  size="sm" 
-                                  onClick={() => handleSaveProgress(goal)}
-                                  className="h-8 w-8 p-0 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white"
-                                  disabled={isUpdatingProgress}
-                                >
-                                  <Check className="w-4 h-4" />
-                                </Button>
-                                <Button 
-                                  size="sm" 
-                                  variant="outline"
-                                  onClick={() => setUpdatingGoalId(null)}
-                                  className="h-8 w-8 p-0 rounded-xl text-zinc-500 hover:text-zinc-900"
-                                >
-                                  <X className="w-4 h-4" />
-                                </Button>
+                              <div className="flex flex-col items-end gap-1">
+                                <div className="flex items-center gap-1.5">
+                                  <Input 
+                                    type="number"
+                                    step="0.01"
+                                    value={updateAmount}
+                                    onChange={(e) => {
+                                      setUpdateAmount(e.target.value);
+                                      setUpdateError('');
+                                    }}
+                                    className="w-32 h-8 rounded-xl text-xs px-2.5"
+                                    placeholder="+ Add amount"
+                                  />
+                                  <Button 
+                                    size="sm" 
+                                    onClick={() => handleSaveProgress(goal)}
+                                    className="h-8 w-8 p-0 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white"
+                                    disabled={isUpdatingProgress}
+                                  >
+                                    <Check className="w-4 h-4" />
+                                  </Button>
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    onClick={() => {
+                                      setUpdatingGoalId(null);
+                                      setUpdateError('');
+                                    }}
+                                    className="h-8 w-8 p-0 rounded-xl text-zinc-500 hover:text-zinc-900"
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                                {updateError && (
+                                  <span className="text-[10px] text-red-500 font-medium">{updateError}</span>
+                                )}
                               </div>
                             ) : (
                               <Button 

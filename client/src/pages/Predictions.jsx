@@ -96,7 +96,7 @@ export default function Predictions() {
       )}
 
       {predictions && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6">
           <Card className="rounded-2xl border-zinc-200 dark:border-zinc-800 shadow-sm bg-gradient-to-br from-indigo-50 to-white dark:from-indigo-950/20 dark:to-zinc-950">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -112,22 +112,7 @@ export default function Predictions() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl border-zinc-200 dark:border-zinc-800 shadow-sm bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950/20 dark:to-zinc-950">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BrainCircuit className="w-5 h-5 text-emerald-500" />
-                Decision Tree
-              </CardTitle>
-              <CardDescription>Predicted next month's total expense</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-4xl font-bold text-emerald-600 dark:text-emerald-400">
-                {formatCurrency(predictions.decision_tree_prediction)}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="rounded-2xl border-zinc-200 dark:border-zinc-800 shadow-sm md:col-span-2">
+          <Card className="rounded-2xl border-zinc-200 dark:border-zinc-800 shadow-sm">
             <CardHeader>
               <CardTitle>Historical Spending Trend</CardTitle>
               <CardDescription>Monthly expense aggregation used for training</CardDescription>

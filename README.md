@@ -22,7 +22,7 @@ This project strictly aligns with the FSD-2 (MERN Stack) and Python-II (Data Sci
 ### Backend 2: Python / Django (Python-II Analytics)
 - **Data Analytics**: Clean and analyze financial data using **Pandas**.
 - **Data Export**: Export expenses to CSV directly from MongoDB.
-- **Machine Learning**: Predict future expenses using **Scikit-Learn** (Linear Regression & Decision Tree Regressor).
+- **Machine Learning**: Predict future expenses using **Scikit-Learn** (Linear Regression).
 - **Data Visualization**: Integrated charts and trends built on aggregated Python analysis.
 
 ## 📁 Project Structure
@@ -84,7 +84,6 @@ python manage.py runserver 8000
 ## 📈 ML Prediction Module
 
 The Python API uses historical monthly aggregated expenses. It runs two models:
-1. **Linear Regression**: For trend line estimations.
-2. **Decision Tree Regressor**: For pattern-based monthly predictions.
+1. **Linear Regression**: Analyzes past expenses to forecast your spending for the next month.
 
 These results are served to the frontend React application under the AI Predictions dashboard.

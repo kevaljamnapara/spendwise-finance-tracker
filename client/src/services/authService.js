@@ -30,6 +30,21 @@ const changePassword = async (passwordData) => {
   return data;
 };
 
+const forgotPassword = async (email) => {
+  const { data } = await api.post('/auth/forgotpassword', { email });
+  return data;
+};
+
+const resetPassword = async (token, password) => {
+  const { data } = await api.put(`/auth/resetpassword/${token}`, { password });
+  return data;
+};
+
+const validateResetToken = async (token) => {
+  const { data } = await api.get(`/auth/resetpassword/${token}`);
+  return data;
+};
+
 const authService = {
   register,
   login,
@@ -37,6 +52,9 @@ const authService = {
   getMe,
   updateProfile,
   changePassword,
+  forgotPassword,
+  resetPassword,
+  validateResetToken,
 };
 
 export default authService;

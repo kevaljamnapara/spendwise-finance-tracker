@@ -1,5 +1,16 @@
 import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
+
+/**
+ * What this file does:
+ * Defines the MongoDB schema and Mongoose model for a User. It also handles password hashing securely.
+ * 
+ * Why this logic exists:
+ * We need a structured way to store user credentials and profile data. The Mongoose schema enforces validation 
+ * (like making email unique and required). The pre-save hook ensures passwords are automatically hashed before 
+ * hitting the database, preventing accidental plaintext storage.
+ */
 
 const UserSchema = new Schema(
   {
@@ -29,6 +40,8 @@ const UserSchema = new Schema(
       type: String,
       default: '',
     },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
   },
   {
     timestamps: true,
@@ -52,10 +65,29 @@ UserSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
+// Generate and hash password token
+UserSchema.methods.getResetPasswordToken = function () {
+  // Generate token
+  const resetToken = crypto.randomBytes(20).toString('hex');
+
+  // Hash token and set to resetPasswordToken field
+  this.resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  // Set expire to 10 minutes
+  this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
+};
+
 // Exclude password from the JSON response
 UserSchema.set('toJSON', {
   transform: (doc, ret) => {
     delete ret.password;
+    delete ret.resetPasswordToken;
+    delete ret.resetPasswordExpire;
     return ret;
   }
 });

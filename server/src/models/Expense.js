@@ -1,5 +1,15 @@
 import mongoose from 'mongoose';
 
+/**
+ * What this file does:
+ * Defines the MongoDB schema and Mongoose model for an Expense record.
+ * 
+ * Why this logic exists:
+ * To store individual spending transactions. The schema uses references (`ref: 'User'` and `ref: 'Category'`) 
+ * to link expenses back to the user who created them and the category they fall under. This normalized approach 
+ * keeps data consistent.
+ */
+
 const expenseSchema = mongoose.Schema(
   {
     user: {

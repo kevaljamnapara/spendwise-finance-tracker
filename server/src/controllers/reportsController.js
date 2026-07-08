@@ -1,13 +1,34 @@
 import Expense from '../models/Expense.js';
 import Income from '../models/Income.js';
 
+/**
+ * What this file does:
+ * Generates comprehensive financial reports (timeline data, expenses by category, incomes by source).
+ * 
+ * Why this logic exists:
+ * To provide the user with aggregated data required to render charts and summaries on the frontend dashboard.
+ * It uses MongoDB Aggregation Pipelines to perform data calculation on the database side, which is much faster than fetching raw data and calculating in Node.js.
+ */
+
 // @desc    Get comprehensive financial reports
 // @route   GET /api/v1/reports
 // @access  Private
+/**
+ * Input: Optional startDate and endDate query parameters.
+ * Output: JSON containing summary totals, timeline data, and category-wise breakdowns.
+ * Flow:
+ * 1. Parse date filters.
+ * 2. Execute an aggregation pipeline for Income to group by month/year and sum amounts.
+ * 3. Execute an aggregation pipeline for Expense to group by month/year and sum amounts.
+ * 4. Merge the two lists into a unified timeline array.
+ * 5. Execute aggregation pipelines to group expenses by category and incomes by source.
+ * 6. Calculate net savings and return everything.
+ */
 export const getReports = async (req, res, next) => {
   try {
     const { startDate, endDate } = req.query;
     
+    // Construct the date filter if provided
     let dateFilter = {};
     if (startDate && endDate) {
       dateFilter.date = { 
@@ -19,6 +40,10 @@ export const getReports = async (req, res, next) => {
     const userId = req.user._id;
 
     // Income vs Expense over time (by month/year)
+    // Aggregation Pipeline Explanation:
+    // $match filters records by user and date.
+    // $group groups the remaining records by year and month, calculating the $sum of amounts.
+    // $sort orders the results chronologically.
     const incomeByMonth = await Income.aggregate([
       { $match: { user: userId, ...dateFilter } },
       { $group: {
@@ -39,7 +64,7 @@ export const getReports = async (req, res, next) => {
       { $sort: { '_id.year': 1, '_id.month': 1 } }
     ]);
     
-    // Merge income and expense by month
+    // Merge income and expense by month into a single array for charting
     const timelineData = {};
     
     incomeByMonth.forEach(item => {
@@ -59,6 +84,11 @@ export const getReports = async (req, res, next) => {
     const timeline = Object.values(timelineData).sort((a, b) => a.name.localeCompare(b.name));
 
     // Expenses by Category
+    // Aggregation Pipeline Explanation:
+    // $match: Filter by user/date.
+    // $group: Group by the category ObjectId, summing the amount.
+    // $lookup: Performs a "join" with the Categories collection to get the category name and color.
+    // $unwind: Flattens the resulting array from the $lookup.
     const expenseByCategory = await Expense.aggregate([
       { $match: { user: userId, ...dateFilter } },
       { $group: { _id: '$category', total: { $sum: '$amount' } } },
@@ -68,8 +98,7 @@ export const getReports = async (req, res, next) => {
       { $sort: { value: -1 } }
     ]);
 
-    // Income by Category
-    // (Assuming income uses categories too, but let's check income schema. Income schema has `source: String`)
+    // Income by Source
     const incomeBySource = await Income.aggregate([
       { $match: { user: userId, ...dateFilter } },
       { $group: { _id: '$source', total: { $sum: '$amount' } } },

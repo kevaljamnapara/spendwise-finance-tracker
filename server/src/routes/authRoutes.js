@@ -6,6 +6,9 @@ import {
   getUserProfile,
   updateUserProfile,
   changePassword,
+  forgotPassword,
+  resetPassword,
+  validateResetToken,
 } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { 
@@ -23,5 +26,8 @@ router.post('/logout', logoutUser);
 router.get('/me', protect, getUserProfile);
 router.put('/profile', protect, updateProfileValidation, updateUserProfile);
 router.put('/password', protect, changePasswordValidation, changePassword);
+router.post('/forgotpassword', forgotPassword);
+router.get('/resetpassword/:resettoken', validateResetToken);
+router.put('/resetpassword/:resettoken', resetPassword);
 
 export default router;

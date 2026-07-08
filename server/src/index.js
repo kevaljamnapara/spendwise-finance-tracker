@@ -21,8 +21,14 @@ connectDB();
 
 // Middlewares
 app.use(helmet());
-app.use(mongoSanitize());
-
+// Custom mongo sanitize to avoid Express 5 TypeError on req getters
+app.use((req, res, next) => {
+  if (req.body) mongoSanitize.sanitize(req.body);
+  if (req.query) mongoSanitize.sanitize(req.query);
+  if (req.params) mongoSanitize.sanitize(req.params);
+  if (req.headers) mongoSanitize.sanitize(req.headers);
+  next();
+});
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   limit: 1000 // limit each IP to 1000 requests per windowMs
@@ -70,5 +76,4 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
 });

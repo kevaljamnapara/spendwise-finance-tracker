@@ -2,19 +2,12 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import authService from '../services/authService';
 
 /**
- * ==========================================
- * VIVA TIP - REACT CONTEXT API vs PROP DRILLING
- * ==========================================
- * What this file does:
- * Manages the global authentication state for the React application using React Context.
+ * Global Authentication Context
  * 
- * Why this logic exists:
- * In React, passing data from a parent component down to many deeply nested child components 
- * is called "Prop Drilling". It makes code messy and hard to maintain.
- * 
- * The Context API solves this by creating a global "store". Any component (like the Navbar or Dashboard) 
- * can easily access the current user's profile and authentication methods (login, logout) by calling `useAuth()`, 
- * without needing props passed down from the root App component.
+ * Manages the global authentication state for the React application.
+ * Using Context avoids "Prop Drilling" and provides a centralized store for the 
+ * current user's profile and authentication methods (login, logout), making it 
+ * accessible to any component in the app via `useAuth()`.
  */
 
 const AuthContext = createContext(undefined);

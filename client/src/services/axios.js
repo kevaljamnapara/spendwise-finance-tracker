@@ -5,15 +5,9 @@ const api = axios.create({
   withCredentials: true, // Important for cookies (JWT)
 });
 
-// ==========================================
-// VIVA TIP - AXIOS INTERCEPTORS
-// ==========================================
-// What is an interceptor? It's a function that Axios runs on every request or response 
-// BEFORE it reaches the calling component.
-// Why use it here? Instead of checking for a 401 (Unauthorized) error in every single API call 
-// (which violates the DRY principle), we catch it globally here. If the JWT token expires, 
-// the server returns 401, and this interceptor automatically redirects the user to the login page.
-
+// Global response interceptor to handle 401 Unauthorized errors globally.
+// This prevents duplicating the 401 check in every API call.
+// If the JWT token expires, this intercepts the 401 error and redirects to login.
 api.interceptors.response.use(
   (response) => {
     // Any status code that lies within the range of 2xx causes this function to trigger

@@ -3,13 +3,8 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 
 /**
- * What this file does:
- * Defines the MongoDB schema and Mongoose model for a User. It also handles password hashing securely.
- * 
- * Why this logic exists:
- * We need a structured way to store user credentials and profile data. The Mongoose schema enforces validation 
- * (like making email unique and required). The pre-save hook ensures passwords are automatically hashed before 
- * hitting the database, preventing accidental plaintext storage.
+ * User Model
+ * Defines the MongoDB schema for a User and handles password hashing securely using bcrypt.
  */
 
 const UserSchema = new Schema(
@@ -48,14 +43,8 @@ const UserSchema = new Schema(
   }
 );
 
-// ==========================================
-// VIVA TIP - PASSWORD HASHING (BCRYPT)
-// ==========================================
-// Why encrypt passwords? Storing plain text passwords is a huge security risk.
-// If the database is compromised, attackers can steal user accounts.
-// Bcrypt uses a "salt" (random string) mixed with the password to generate a secure hash.
-
-// Pre-save hook: This function runs automatically every time before a user document is saved.
+// Password hashing middleware using bcrypt.
+// This pre-save hook runs automatically before a user document is saved to the database.
 UserSchema.pre('save', async function () {
   // If the user isn't updating their password, skip hashing to save performance and prevent double-hashing
   if (!this.isModified('password')) {

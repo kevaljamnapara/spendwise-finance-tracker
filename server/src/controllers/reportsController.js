@@ -4,10 +4,9 @@ import Income from '../models/Income.js';
 /**
  * What this file does:
  * Generates comprehensive financial reports (timeline data, expenses by category, incomes by source).
- * 
- * VIVA TIP - WHY USE AGGREGATION?
- * In a MERN stack, we use MongoDB Aggregation Pipelines to perform data calculation on the database side. 
- * This is much faster and more memory-efficient than fetching thousands of raw records to the Node.js server and calculating totals in JavaScript.
+ * Performance Optimization:
+ * Uses MongoDB Aggregation Pipelines to perform data calculation on the database side. 
+ * This is faster and more memory-efficient than fetching raw records to the Node.js server.
  */
 
 // @desc    Get comprehensive financial reports

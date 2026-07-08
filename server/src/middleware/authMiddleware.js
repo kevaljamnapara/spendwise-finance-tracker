@@ -11,22 +11,10 @@ import User from '../models/User.js';
  * writing this check in every single controller function.
  */
 
-/**
- * Input: HTTP request (checks cookies for 'jwt').
- * Output: Proceeds to the next middleware/controller if authorized; Error otherwise.
- * Flow:
- * 1. Read JWT from cookies.
- * 2. If present, verify the token using the secret key.
- * 3. Fetch the associated user from the DB and attach it to the `req.user` object.
- * 4. Call next() to proceed. If any step fails, return a 401 Unauthorized error.
- */
-// ==========================================
-// VIVA TIP - JSON WEB TOKENS (JWT)
-// ==========================================
-// JWTs are used for stateless authentication. Instead of storing a session on the server,
-// the server signs a token containing the user ID and sends it to the client as an HttpOnly cookie.
-// On subsequent requests, the client sends this cookie. The server verifies the signature
-// using the JWT_SECRET. If valid, the server knows exactly who the user is without querying a session store.
+// JWT Stateless Authentication
+// Instead of storing a session on the server, the server signs a token containing the user ID 
+// and sends it to the client as an HttpOnly cookie. On subsequent requests, the server verifies 
+// the signature using the JWT_SECRET to authenticate the user without querying a session store.
 
 export const protect = async (req, res, next) => {
   let token;

@@ -122,21 +122,28 @@ def analytics_summary(request):
 @api_view(['POST'])
 def predict_expense(request):
     """
+    ==========================================
+    VIVA TIP - MACHINE LEARNING & PANDAS
+    ==========================================
     What this function does: 
-    Predicts the next month's expense using a simple Linear Regression model based on historical data.
+    Predicts the next month's expense using a Linear Regression model based on historical data.
     
     Why this logic exists: 
-    To give users a forecast of their future spending, helping them budget better. Linear regression provides a straightforward, explainable baseline for prediction.
+    To give users a forecast of their future spending.
     
-    Input: POST request containing 'user_id' in the body.
-    Output: JSON with the linear regression prediction and historical trend.
+    Key Concepts to Explain in Viva:
+    1. Pandas: We use Pandas DataFrames because they make cleaning (handling missing dates/amounts) 
+       and grouping data by month extremely fast and easy compared to standard Python loops.
+    2. Linear Regression: We chose Scikit-Learn's LinearRegression because it is a fast, interpretable baseline model.
+       It works by plotting a "line of best fit" through historical monthly totals to predict the next point.
+       It is much simpler and less prone to overfitting than complex models (like Decision Trees) for small datasets.
+    
     Flow:
     1. Queries expenses for the specific user.
-    2. Cleans data and aggregates amounts by month.
+    2. Cleans data and aggregates amounts by month using Pandas.
     3. Creates a time index (X) and target amounts (y) for the machine learning model.
-    4. Trains a Scikit-Learn Linear Regression model.
+    4. Trains the Linear Regression model on historical data.
     5. Predicts the amount for the next sequential month.
-    6. Returns the prediction and historical data.
     """
     db = get_db()
     

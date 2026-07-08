@@ -20,19 +20,29 @@ import User from '../models/User.js';
  * 3. Fetch the associated user from the DB and attach it to the `req.user` object.
  * 4. Call next() to proceed. If any step fails, return a 401 Unauthorized error.
  */
+// ==========================================
+// VIVA TIP - JSON WEB TOKENS (JWT)
+// ==========================================
+// JWTs are used for stateless authentication. Instead of storing a session on the server,
+// the server signs a token containing the user ID and sends it to the client as an HttpOnly cookie.
+// On subsequent requests, the client sends this cookie. The server verifies the signature
+// using the JWT_SECRET. If valid, the server knows exactly who the user is without querying a session store.
+
 export const protect = async (req, res, next) => {
   let token;
 
+  // The cookie parser middleware automatically extracts the 'jwt' cookie
   token = req.cookies.jwt;
 
   if (token) {
     try {
+      // jwt.verify checks the signature and expiration date
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
-      // Attach the user (without the password) to the request object
+      
+      // Attach the user (without the password) to the request object so subsequent controllers can use it
       req.user = await User.findById(decoded.userId).select('-password');
-      next();
+      next(); // Authentication successful, proceed to the next middleware or controller
     } catch (error) {
-      console.error(error);
       res.status(401);
       next(new Error('Not authorized, token failed'));
     }

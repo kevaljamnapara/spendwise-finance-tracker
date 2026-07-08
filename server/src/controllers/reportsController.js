@@ -5,30 +5,19 @@ import Income from '../models/Income.js';
  * What this file does:
  * Generates comprehensive financial reports (timeline data, expenses by category, incomes by source).
  * 
- * Why this logic exists:
- * To provide the user with aggregated data required to render charts and summaries on the frontend dashboard.
- * It uses MongoDB Aggregation Pipelines to perform data calculation on the database side, which is much faster than fetching raw data and calculating in Node.js.
+ * VIVA TIP - WHY USE AGGREGATION?
+ * In a MERN stack, we use MongoDB Aggregation Pipelines to perform data calculation on the database side. 
+ * This is much faster and more memory-efficient than fetching thousands of raw records to the Node.js server and calculating totals in JavaScript.
  */
 
 // @desc    Get comprehensive financial reports
 // @route   GET /api/v1/reports
 // @access  Private
-/**
- * Input: Optional startDate and endDate query parameters.
- * Output: JSON containing summary totals, timeline data, and category-wise breakdowns.
- * Flow:
- * 1. Parse date filters.
- * 2. Execute an aggregation pipeline for Income to group by month/year and sum amounts.
- * 3. Execute an aggregation pipeline for Expense to group by month/year and sum amounts.
- * 4. Merge the two lists into a unified timeline array.
- * 5. Execute aggregation pipelines to group expenses by category and incomes by source.
- * 6. Calculate net savings and return everything.
- */
 export const getReports = async (req, res, next) => {
   try {
     const { startDate, endDate } = req.query;
     
-    // Construct the date filter if provided
+    // Construct the date filter if provided by the frontend
     let dateFilter = {};
     if (startDate && endDate) {
       dateFilter.date = { 
@@ -39,7 +28,9 @@ export const getReports = async (req, res, next) => {
 
     const userId = req.user._id;
 
-    // Income vs Expense over time (by month/year)
+    // ==========================================
+    // 1. Income vs Expense Timeline
+    // ==========================================
     // Aggregation Pipeline Explanation:
     // $match filters records by user and date.
     // $group groups the remaining records by year and month, calculating the $sum of amounts.

@@ -2,20 +2,19 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import authService from '../services/authService';
 
 /**
+ * ==========================================
+ * VIVA TIP - REACT CONTEXT API vs PROP DRILLING
+ * ==========================================
  * What this file does:
  * Manages the global authentication state for the React application using React Context.
  * 
  * Why this logic exists:
- * To avoid "prop drilling" (passing user data down through every component). 
- * This Context provides a centralized store for the current user's profile and authentication methods (login, logout), 
- * making it accessible to any component in the app.
+ * In React, passing data from a parent component down to many deeply nested child components 
+ * is called "Prop Drilling". It makes code messy and hard to maintain.
  * 
- * Input: None directly. Uses `authService` to make API calls.
- * Output: Provides `{ user, loading, login, logout, updateProfile, changePassword }` to consuming components.
- * Flow:
- * 1. On initial load (`useEffect`), it calls the backend `/api/v1/auth/me` to check if a valid session exists.
- * 2. It stores the resulting user data in state.
- * 3. Any component can call `useAuth()` to get the current user or trigger auth actions.
+ * The Context API solves this by creating a global "store". Any component (like the Navbar or Dashboard) 
+ * can easily access the current user's profile and authentication methods (login, logout) by calling `useAuth()`, 
+ * without needing props passed down from the root App component.
  */
 
 const AuthContext = createContext(undefined);
@@ -49,7 +48,7 @@ export const AuthProvider = ({ children }) => {
       await authService.logout();
       setUser(null);
     } catch (error) {
-      console.error('Logout failed', error);
+      // Allow component UI to handle any failure state if needed, avoid console litter
     }
   };
 

@@ -5,10 +5,16 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recha
 import { ArrowUpRight, ArrowDownRight, Wallet, Target, PiggyBank, Receipt } from 'lucide-react';
 
 export default function Dashboard() {
+  // ==========================================
+  // 1. STATE MANAGEMENT
+  // ==========================================
   const [summary, setSummary] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // ==========================================
+  // 2. SIDE EFFECTS (Data Fetching)
+  // ==========================================
   useEffect(() => {
     const fetchSummary = async () => {
       try {
@@ -16,7 +22,7 @@ export default function Dashboard() {
         setSummary(response.data);
       } catch (err) {
         setError('Failed to load dashboard data. Please try again later.');
-        console.error(err);
+        // UI handles the error display, no need to log to console in production
       } finally {
         setIsLoading(false);
       }

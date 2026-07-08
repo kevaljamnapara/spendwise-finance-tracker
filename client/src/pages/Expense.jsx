@@ -21,6 +21,9 @@ const expenseSchema = z.object({
 });
 
 export default function Expense() {
+  // ==========================================
+  // 1. STATE MANAGEMENT
+  // ==========================================
   const [expenses, setExpenses] = useState([]);
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -39,6 +42,9 @@ export default function Expense() {
     },
   });
 
+  // ==========================================
+  // 2. SIDE EFFECTS (Data Fetching)
+  // ==========================================
   const fetchData = async () => {
     try {
       const [expensesRes, categoriesRes] = await Promise.all([
@@ -49,7 +55,7 @@ export default function Expense() {
       setCategories(categoriesRes.data.filter(c => c.type === 'expense'));
     } catch (err) {
       setError('Failed to load data');
-      console.error(err);
+      // UI handles the error state, no need to log to console
     } finally {
       setIsLoading(false);
     }
@@ -59,6 +65,9 @@ export default function Expense() {
     fetchData();
   }, []);
 
+  // ==========================================
+  // 3. EVENT HANDLERS
+  // ==========================================
   const onSubmit = async (values) => {
     setIsSubmitting(true);
     setError('');
@@ -143,12 +152,19 @@ export default function Expense() {
     document.body.removeChild(link);
   };
 
+  // ==========================================
+  // 4. RENDER HELPERS
+  // ==========================================
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
     }).format(amount);
   };
+
+  // ==========================================
+  // 5. MAIN RENDER
+  // ==========================================
 
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto space-y-8">

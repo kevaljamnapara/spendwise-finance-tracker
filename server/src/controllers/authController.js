@@ -42,40 +42,41 @@ export const registerUser = async (req, res, next) => {
       password,
     });
 
-    if (user) {
-      // Create default categories for the new user to start with a usable state
-      const defaultCategories = [
-        // Expenses
-        { user: user._id, name: 'Food & Dining', type: 'expense', color: '#f87171' },
-        { user: user._id, name: 'Transportation', type: 'expense', color: '#60a5fa' },
-        { user: user._id, name: 'Housing', type: 'expense', color: '#34d399' },
-        { user: user._id, name: 'Utilities', type: 'expense', color: '#fbbf24' },
-        { user: user._id, name: 'Entertainment', type: 'expense', color: '#a78bfa' },
-        { user: user._id, name: 'Healthcare', type: 'expense', color: '#f472b6' },
-        { user: user._id, name: 'Shopping', type: 'expense', color: '#38bdf8' },
-        // Incomes
-        { user: user._id, name: 'Salary', type: 'income', color: '#34d399' },
-        { user: user._id, name: 'Freelance', type: 'income', color: '#60a5fa' },
-        { user: user._id, name: 'Investments', type: 'income', color: '#818cf8' },
-      ];
-      await Category.insertMany(defaultCategories);
-
-      generateToken(res, user._id);
-      res.status(201).json({
-        success: true,
-        message: 'User registered successfully',
-        data: {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          avatar: user.avatar,
-        }
-      });
-    } else {
+    // Early return if user creation failed
+    if (!user) {
       res.status(400);
       throw new Error('Invalid user data');
     }
+
+    // Create default categories for the new user to start with a usable state
+    const defaultCategories = [
+      // Expenses
+      { user: user._id, name: 'Food & Dining', type: 'expense', color: '#f87171' },
+      { user: user._id, name: 'Transportation', type: 'expense', color: '#60a5fa' },
+      { user: user._id, name: 'Housing', type: 'expense', color: '#34d399' },
+      { user: user._id, name: 'Utilities', type: 'expense', color: '#fbbf24' },
+      { user: user._id, name: 'Entertainment', type: 'expense', color: '#a78bfa' },
+      { user: user._id, name: 'Healthcare', type: 'expense', color: '#f472b6' },
+      { user: user._id, name: 'Shopping', type: 'expense', color: '#38bdf8' },
+      // Incomes
+      { user: user._id, name: 'Salary', type: 'income', color: '#34d399' },
+      { user: user._id, name: 'Freelance', type: 'income', color: '#60a5fa' },
+      { user: user._id, name: 'Investments', type: 'income', color: '#818cf8' },
+    ];
+    await Category.insertMany(defaultCategories);
+
+    generateToken(res, user._id);
+    res.status(201).json({
+      success: true,
+      message: 'User registered successfully',
+      data: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar,
+      }
+    });
   } catch (error) {
     next(error); // Pass to global error handler
   }
@@ -99,23 +100,23 @@ export const authUser = async (req, res, next) => {
     const user = await User.findOne({ email });
 
     // Ensure user exists AND the password matches the hash in DB
-    if (user && (await user.matchPassword(password))) {
-      generateToken(res, user._id);
-      res.json({
-        success: true,
-        message: 'Login successful',
-        data: {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          avatar: user.avatar,
-        }
-      });
-    } else {
+    if (!user || !(await user.matchPassword(password))) {
       res.status(401);
       throw new Error('Invalid email or password');
     }
+
+    generateToken(res, user._id);
+    res.json({
+      success: true,
+      message: 'Login successful',
+      data: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar,
+      }
+    });
   } catch (error) {
     next(error);
   }
@@ -155,22 +156,22 @@ export const getUserProfile = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id);
 
-    if (user) {
-      res.json({
-        success: true,
-        message: 'User profile retrieved successfully',
-        data: {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          avatar: user.avatar,
-        }
-      });
-    } else {
+    if (!user) {
       res.status(404);
       throw new Error('User not found');
     }
+
+    res.json({
+      success: true,
+      message: 'User profile retrieved successfully',
+      data: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar,
+      }
+    });
   } catch (error) {
     next(error);
   }
@@ -191,40 +192,40 @@ export const updateUserProfile = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id);
 
-    if (user) {
-      user.name = req.body.name || user.name;
-      user.email = req.body.email || user.email;
-      
-      if (req.body.avatar !== undefined) {
-        user.avatar = req.body.avatar;
-      }
-
-      // Ensure new email isn't already taken by another user
-      if (req.body.email && req.body.email !== user.email) {
-        const emailExists = await User.findOne({ email: req.body.email });
-        if (emailExists) {
-          res.status(400);
-          throw new Error('Email is already in use by another account');
-        }
-      }
-
-      const updatedUser = await user.save();
-
-      res.json({
-        success: true,
-        message: 'Profile updated successfully',
-        data: {
-          _id: updatedUser._id,
-          name: updatedUser.name,
-          email: updatedUser.email,
-          role: updatedUser.role,
-          avatar: updatedUser.avatar,
-        }
-      });
-    } else {
+    if (!user) {
       res.status(404);
       throw new Error('User not found');
     }
+
+    user.name = req.body.name || user.name;
+    user.email = req.body.email || user.email;
+    
+    if (req.body.avatar !== undefined) {
+      user.avatar = req.body.avatar;
+    }
+
+    // Ensure new email isn't already taken by another user
+    if (req.body.email && req.body.email !== user.email) {
+      const emailExists = await User.findOne({ email: req.body.email });
+      if (emailExists) {
+        res.status(400);
+        throw new Error('Email is already in use by another account');
+      }
+    }
+
+    const updatedUser = await user.save();
+
+    res.json({
+      success: true,
+      message: 'Profile updated successfully',
+      data: {
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        avatar: updatedUser.avatar,
+      }
+    });
   } catch (error) {
     next(error);
   }
@@ -245,27 +246,27 @@ export const changePassword = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id);
 
-    if (user) {
-      const { currentPassword, newPassword } = req.body;
-      
-      // Compare submitted current password with DB hash
-      if (!(await user.matchPassword(currentPassword))) {
-        res.status(401);
-        throw new Error('Incorrect current password');
-      }
-
-      user.password = newPassword;
-      await user.save(); // Hashing happens automatically in User.js pre-save middleware
-
-      res.json({
-        success: true,
-        message: 'Password changed successfully',
-        data: null
-      });
-    } else {
+    if (!user) {
       res.status(404);
       throw new Error('User not found');
     }
+
+    const { currentPassword, newPassword } = req.body;
+    
+    // Compare submitted current password with DB hash
+    if (!(await user.matchPassword(currentPassword))) {
+      res.status(401);
+      throw new Error('Incorrect current password');
+    }
+
+    user.password = newPassword;
+    await user.save(); // Hashing happens automatically in User.js pre-save middleware
+
+    res.json({
+      success: true,
+      message: 'Password changed successfully',
+      data: null
+    });
   } catch (error) {
     next(error);
   }
@@ -314,7 +315,6 @@ export const forgotPassword = async (req, res, next) => {
         message: 'Email sent',
       });
     } catch (err) {
-      console.error(err);
       user.resetPasswordToken = undefined;
       user.resetPasswordExpire = undefined;
 

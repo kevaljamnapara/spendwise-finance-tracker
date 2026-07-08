@@ -48,20 +48,31 @@ const UserSchema = new Schema(
   }
 );
 
-// Encrypt password before saving
+// ==========================================
+// VIVA TIP - PASSWORD HASHING (BCRYPT)
+// ==========================================
+// Why encrypt passwords? Storing plain text passwords is a huge security risk.
+// If the database is compromised, attackers can steal user accounts.
+// Bcrypt uses a "salt" (random string) mixed with the password to generate a secure hash.
+
+// Pre-save hook: This function runs automatically every time before a user document is saved.
 UserSchema.pre('save', async function () {
+  // If the user isn't updating their password, skip hashing to save performance and prevent double-hashing
   if (!this.isModified('password')) {
     return;
   }
+  // Generate a salt with 10 rounds (a good balance of security vs performance)
   const salt = await bcrypt.genSalt(10);
   if (this.password) {
+    // Replace the plaintext password with the hashed version before saving to the DB
     this.password = await bcrypt.hash(this.password, salt);
   }
 });
 
-// Match user entered password to hashed password in database
+// Method to verify passwords during login
 UserSchema.methods.matchPassword = async function (enteredPassword) {
   if (!this.password) return false;
+  // bcrypt.compare safely compares the plain text input with the stored hash
   return await bcrypt.compare(enteredPassword, this.password);
 };
 

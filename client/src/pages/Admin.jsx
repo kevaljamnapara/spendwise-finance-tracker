@@ -23,9 +23,8 @@ export default function Admin() {
       ]);
       setUsers(usersRes.data);
       setStats(statsRes.data);
-    } catch (err) {
+    } catch {
       setError('Failed to load admin data');
-      console.error(err);
     } finally {
       setIsLoading(false);
     }

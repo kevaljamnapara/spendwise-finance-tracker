@@ -41,9 +41,8 @@ export default function Savings() {
     try {
       const response = await savingsService.getSavingsGoals();
       setGoals(response.data);
-    } catch (err) {
-      setError('Failed to load savings goals');
-      console.error(err);
+    } catch {
+      setError('Failed to load data');
     } finally {
       setIsLoading(false);
     }

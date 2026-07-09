@@ -23,9 +23,8 @@ export default function Reports() {
       try {
         const response = await reportsService.getReports(startDate, endDate);
         setReportData(response.data);
-      } catch (err) {
-        setError('Failed to load reports');
-        console.error(err);
+      } catch {
+        setError('Failed to load report data');
       } finally {
         setIsLoading(false);
       }

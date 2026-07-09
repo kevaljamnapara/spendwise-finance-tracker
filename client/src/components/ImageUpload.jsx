@@ -34,7 +34,6 @@ export default function ImageUpload({
       });
       onChange(data.data.url);
     } catch (err) {
-      console.error(err);
       setError(err.response?.data?.message || 'Failed to upload image');
     } finally {
       setIsUploading(false);

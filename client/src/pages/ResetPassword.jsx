@@ -62,7 +62,7 @@ export default function ResetPassword() {
     setSuccess('');
 
     try {
-      const response = await authService.resetPassword(resetToken, values.password);
+      await authService.resetPassword(resetToken, values.password);
       setSuccess('Password has been successfully reset. You can now log in.');
       setTimeout(() => {
         navigate('/login');

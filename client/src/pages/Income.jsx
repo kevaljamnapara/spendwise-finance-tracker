@@ -38,9 +38,8 @@ export default function Income() {
     try {
       const response = await incomeService.getIncomes();
       setIncomes(response.data);
-    } catch (err) {
-      setError('Failed to load income records');
-      console.error(err);
+    } catch {
+      setError('Failed to load data');
     } finally {
       setIsLoading(false);
     }

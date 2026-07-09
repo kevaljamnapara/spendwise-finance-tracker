@@ -53,7 +53,7 @@ export default function Expense() {
       ]);
       setExpenses(expensesRes.data);
       setCategories(categoriesRes.data.filter(c => c.type === 'expense'));
-    } catch (err) {
+    } catch {
       setError('Failed to load data');
       // UI handles the error state, no need to log to console
     } finally {

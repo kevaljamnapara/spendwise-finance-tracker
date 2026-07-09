@@ -35,9 +35,8 @@ export default function Categories() {
     try {
       const response = await categoryService.getCategories();
       setCategories(response.data);
-    } catch (err) {
+    } catch {
       setError('Failed to load categories');
-      console.error(err);
     } finally {
       setIsLoading(false);
     }

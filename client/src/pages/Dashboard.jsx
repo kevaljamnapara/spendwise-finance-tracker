@@ -20,7 +20,7 @@ export default function Dashboard() {
       try {
         const response = await dashboardService.getSummary();
         setSummary(response.data);
-      } catch (err) {
+      } catch {
         setError('Failed to load dashboard data. Please try again later.');
         // UI handles the error display, no need to log to console in production
       } finally {

@@ -44,9 +44,8 @@ export default function Budget() {
       ]);
       setBudgets(budgetsRes.data);
       setCategories(categoriesRes.data.filter(c => c.type === 'expense'));
-    } catch (err) {
+    } catch {
       setError('Failed to load data');
-      console.error(err);
     } finally {
       setIsLoading(false);
     }

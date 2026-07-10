@@ -40,8 +40,8 @@ export const AuthProvider = ({ children }) => {
     try {
       await authService.logout();
       setUser(null);
-    } catch {
-      // Allow component UI to handle any failure state if needed, avoid console litter
+    } catch (error) {
+      throw error;
     }
   };
 
